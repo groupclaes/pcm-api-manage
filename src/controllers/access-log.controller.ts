@@ -1,13 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { JWTPayload } from 'jose'
 import AccessLog from '../repositories/access-log.repository'
-import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
@@ -36,8 +31,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new AccessLog(request.log, pool)
+      const repo = new AccessLog(request.log)
 
       const result = await repo.get(request.jwt.sub)
 

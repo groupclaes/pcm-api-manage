@@ -6,6 +6,7 @@ import util from 'util'
 import path from 'path'
 import crypto from 'crypto'
 import { pipeline } from 'stream'
+import { env } from 'process'
 import sharp from 'sharp'
 
 const pump = util.promisify(pipeline)
@@ -19,14 +20,8 @@ const deleteOnDirs = [
 ]
 
 import Document, { DBResultSet } from '../repositories/document.repository'
-import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
-  
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
@@ -62,8 +57,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission', permission: 'write' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new Document(request.log, pool)
+      const repo = new Document(request.log)
 
       const parts: {
         filename: string,

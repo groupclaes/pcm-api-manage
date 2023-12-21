@@ -2,14 +2,8 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify"
 import { JWTPayload } from "jose"
 import { IRepositoryBooleanResult } from "../repositories"
 import Directory from "../repositories/directory.repository"
-import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
-  
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
@@ -41,8 +35,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new Directory(request.log, pool)
+      const repo = new Directory(request.log)
       let result = await repo.get(request.params.id, request.jwt.sub)
 
       if (result.verified) {
@@ -75,8 +68,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new Directory(request.log, pool)
+      const repo = new Directory(request.log)
       const result = await repo.post(request.body.parent_id, request.body.name, request.jwt.sub)
 
       if (result.verified) {
@@ -110,8 +102,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new Directory(request.log, pool)
+      const repo = new Directory(request.log)
       let result: IRepositoryBooleanResult
 
       if (request.body.id !== request.params.id)
@@ -146,8 +137,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool()
-      const repo = new Directory(request.log, pool)
+      const repo = new Directory(request.log)
       const result = await repo.delete(request.params.id, request.jwt.sub)
 
       if (result.verified) {
