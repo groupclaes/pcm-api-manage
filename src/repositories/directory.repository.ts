@@ -1,20 +1,18 @@
 import { IRepositoryBooleanResult, IRepositoryResult } from "."
 
 import sql from 'mssql'
+import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
 
+const DB_NAME = 'PCM'
 export default class Directory {
   schema: string = '[directory].'
   _logger: FastifyBaseLogger
-  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
-    this._logger = logger
-    this._pool = pool
-  }
+  constructor(logger: FastifyBaseLogger) { this._logger = logger }
 
   async get(id?: number, user_id?: string): Promise<IRepositoryResult> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
     if (id)
       r.input('id', sql.Int, id)
@@ -35,7 +33,7 @@ export default class Directory {
 
   async post(id: number, name: string, user_id?: string): Promise<IRepositoryBooleanResult> {
     console.debug(`Running procedure ${this.schema}usp_add with user_id: ${user_id} and id: ${id} and name: "${name}"`)
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
     r.input('id', sql.Int, id)
     r.input('name', sql.VarChar, name)
@@ -51,7 +49,7 @@ export default class Directory {
   }
 
   async update(id: number, name: string, cache_expire_duration?: number, user_id?: string): Promise<IRepositoryBooleanResult> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
     r.input('id', sql.Int, id)
     r.input('name', sql.VarChar, name)
@@ -72,7 +70,7 @@ export default class Directory {
   }
 
   async move(id: number, parent_id: number, user_id?: string): Promise<IRepositoryBooleanResult> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
     r.input('id', sql.Int, id)
     r.input('parent_id', sql.Int, parent_id)
@@ -92,7 +90,7 @@ export default class Directory {
   }
 
   async delete(id: number, user_id?: string): Promise<IRepositoryBooleanResult> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
     r.input('id', sql.Int, id)
     const result = await r.execute(`${this.schema}usp_delete`)
@@ -111,7 +109,7 @@ export default class Directory {
   }
 
   async getCompany(directory_id: number): Promise<IRepositoryResult> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('directoryId', sql.Int, directory_id)
     const result = await r.execute(`GetDirectoryCompanyById`)
 

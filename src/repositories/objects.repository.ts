@@ -1,18 +1,17 @@
 import sql from 'mssql'
+import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
+
+const DB_NAME = 'PCM'
 
 export default class Objects {
   schema: string = '[manage].'
   _logger: FastifyBaseLogger
-  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
-    this._logger = logger
-    this._pool = pool
-  }
+  constructor(logger: FastifyBaseLogger) { this._logger = logger }
 
   async getLanguages(user_id?: string) {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
 
     const result = await r.execute(`${this.schema}usp_getActiveLanguages`)
@@ -31,7 +30,7 @@ export default class Objects {
   }
 
   async getAttributes(user_id?: string) {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
 
     const result = await r.execute(`${this.schema}usp_getActiveAttributes`)
@@ -50,7 +49,7 @@ export default class Objects {
   }
 
   async getUsers(user_id?: string) {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('user_id', sql.Int, user_id)
 
     const result = await r.execute(`${this.schema}usp_getActiveUsers`)

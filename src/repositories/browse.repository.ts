@@ -1,25 +1,24 @@
 import sql from 'mssql'
+import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
+
+const DB_NAME = 'PCM'
 
 export default class Browse {
   schema: string = '[manage].'
   _logger: FastifyBaseLogger
-  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
-    this._logger = logger
-    this._pool = pool
-  }
+  constructor(logger: FastifyBaseLogger) { this._logger = logger }
 
   async getContent(page: number, itemCount: number, directoryId: number | undefined, query: string, onlyInvalid: boolean, user_id?: string): Promise<any> {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('page', sql.Int, page)
     r.input('itemCount', sql.Int, itemCount)
     r.input('directoryId', sql.Int, directoryId)
     r.input('query', sql.VarChar, query)
     r.input('onlyInvalid', sql.Bit, onlyInvalid)
     r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { user_id }, sqlSchema: this.schema, sqlProc: '[GetUiPageV2]' }, 'running procedure')
+    this._logger.debug({ sqlParam: { user_id }, sqlDb: DB_NAME, sqlSchema: this.schema, sqlProc: '[GetUiPageV2]' }, 'running procedure')
 
     const result = await r.execute('GetUiPageV2')
     this._logger.debug({ result }, 'procedure result')
@@ -48,10 +47,10 @@ export default class Browse {
  * @returns {Promise<any>}
  */
   async getBreadcrumbs(id: number, user_id?: string) {
-    const r = new sql.Request(this._pool)
+    const r = new sql.Request(await db.get(DB_NAME))
     r.input('id', sql.Int, id)
     r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { id, user_id }, sqlSchema: this.schema, sqlProc: '[GetUiBreadcrumbs]' }, 'running procedure')
+    this._logger.debug({ sqlParam: { id, user_id }, sqlDb: DB_NAME, sqlSchema: this.schema, sqlProc: '[GetUiBreadcrumbs]' }, 'running procedure')
 
     const result = await r.execute('[GetUiBreadcrumbs]')
     this._logger.debug({ result }, 'procedure result')
