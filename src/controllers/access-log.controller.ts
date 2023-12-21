@@ -5,12 +5,13 @@ import sql from 'mssql'
 import { env } from 'process'
 
 declare module 'fastify' {
+  export interface FastifyInstance {
+    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
+  }
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
     hasPermission: (permission: string, scope?: string) => boolean
-
-    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
   }
 
   export interface FastifyReply {
@@ -35,7 +36,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await request.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
       const repo = new AccessLog(request.log, pool)
 
       const result = await repo.get(request.jwt.sub)

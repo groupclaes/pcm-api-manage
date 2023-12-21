@@ -1,20 +1,21 @@
 import sql from 'mssql'
-import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
-
-const DB_NAME = 'PCM'
 
 export default class Check {
   schema: string = '[manage].'
   _logger: FastifyBaseLogger
+  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger) { this._logger = logger }
+  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
+    this._logger = logger
+    this._pool = pool
+  }
 
   async get(supplier_id: string, user_id?: string): Promise<any> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('supplier_id', sql.Int, supplier_id)
     r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { user_id, supplier_id }, sqlDb: DB_NAME, sqlSchema: this.schema, sqlProc: 'usp_getCheck' }, 'running procedure')
+    this._logger.debug({ sqlParam: { user_id, supplier_id }, sqlSchema: this.schema, sqlProc: 'usp_getCheck' }, 'running procedure')
 
     const result = await r.execute(`${this.schema}usp_getCheck`)
     this._logger.debug({ result }, 'procedure result')

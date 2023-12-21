@@ -5,8 +5,14 @@ import oe from '@groupclaes/oe-connector'
 import Document, { IDocument } from "../repositories/document.repository"
 import * as helper from '../helper'
 import Directory from "../repositories/directory.repository"
+import sql from 'mssql'
+import { env } from 'process'
 
 declare module 'fastify' {
+  export interface FastifyInstance {
+    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
+  }
+
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
@@ -38,7 +44,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
       const mode = request.query.mode ?? 'full'
       const result: any = (mode === 'preview') ? await repo.getPreview(request.params.id, request.jwt.sub) : await repo.get(request.params.id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
@@ -108,7 +115,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
 
       if (request.body.document.deletedYear && request.body.document.deletedMonth && request.body.document.deletedDay) {
         let date = new Date(Date.UTC(request.body.document.deletedYear, request.body.document.deletedMonth - 1, request.body.document.deletedDay))
@@ -153,7 +161,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
       const result = await repo.delete(request.params.id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
 
@@ -185,7 +194,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
 
       const result = await repo.getMetaDataLinks(request.params.id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
@@ -216,7 +226,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
 
       const result = await repo.postMetaDataLink(request.params.id, request.body.id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
@@ -245,7 +256,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
 
       const result = await repo.deleteMetaDataLink(request.params.id, request.params.slave_id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
@@ -275,7 +287,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Document(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Document(request.log, pool)
       const result = await repo.getNextObjectId(request.query.directory_id, request.jwt.sub)
 
       if (result.verified) {
@@ -309,7 +322,8 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const repo = new Directory(request.log)
+      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const repo = new Directory(request.log, pool)
       const itemNums = request.body.itemNums.map(e => ({ id: e.toString() }))
 
       oe.configure({
