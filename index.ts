@@ -1,8 +1,8 @@
-import main from './src'
+import server from './src'
 const cfg = require('./config')
 
-(async function () {
-  const fastify = await main(cfg);
+const main = async function () {
+  const fastify = await server(cfg);
 
   ['SIGTERM', 'SIGINT'].forEach(signal => {
     process.on(signal, async () => {
@@ -10,4 +10,6 @@ const cfg = require('./config')
       process.exit(0)
     })
   })
-})()
+}
+
+main()
