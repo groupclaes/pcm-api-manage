@@ -24,7 +24,7 @@ import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {
-    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
+    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
   }
   
   export interface FastifyRequest {
@@ -62,7 +62,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission', permission: 'write' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Document(request.log, pool)
 
       const parts: {

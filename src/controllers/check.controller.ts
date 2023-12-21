@@ -7,7 +7,7 @@ import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {
-    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
+    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
   }
   
   export interface FastifyRequest {
@@ -41,7 +41,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Check(request.log, pool)
       const result = await repo.get(request.query.query, request.jwt.sub)
 
@@ -69,7 +69,7 @@ export default async function (fastify: FastifyInstance) {
     if (!request.hasPermission('read', 'GroupClaes.PCM/datasheet-check'))
       return reply.fail({ role: 'missing permission' }, 403)
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Check(request.log, pool)
       const csv = await repo.post(request.body)
 
@@ -99,7 +99,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Suppliers(request.log, pool)
       const result = await repo.query(request.query.query, request.jwt.sub)
 

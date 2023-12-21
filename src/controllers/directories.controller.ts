@@ -7,7 +7,7 @@ import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {
-    getSqlPool: (name: string) => Promise<sql.ConnectionPool>
+    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
   }
   
   export interface FastifyRequest {
@@ -41,7 +41,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Directory(request.log, pool)
       let result = await repo.get(request.params.id, request.jwt.sub)
 
@@ -75,7 +75,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Directory(request.log, pool)
       const result = await repo.post(request.body.parent_id, request.body.name, request.jwt.sub)
 
@@ -110,7 +110,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Directory(request.log, pool)
       let result: IRepositoryBooleanResult
 
@@ -146,7 +146,7 @@ export default async function (fastify: FastifyInstance) {
       return reply.fail({ role: 'missing permission' }, 403)
 
     try {
-      const pool = await fastify.getSqlPool(env['DB_NAME'] ?? 'PCM')
+      const pool = await fastify.getSqlPool()
       const repo = new Directory(request.log, pool)
       const result = await repo.delete(request.params.id, request.jwt.sub)
 
