@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@fastify/multipart": "^8.0.0",
-    "@groupclaes/fastify-elastic": "^4.1.5",
+    "@groupclaes/fastify-elastic": "^4.2.0-next.0",
     "@groupclaes/oe-connector": "^1.2.5",
     "fastify": "^4.24.3",
     "jose": "^5.1.3",
