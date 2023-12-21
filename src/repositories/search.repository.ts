@@ -1,17 +1,18 @@
 import sql from 'mssql'
-import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
-
-const DB_NAME = 'PCM'
 
 export default class Search {
   schema: string = '[search].'
   _logger: FastifyBaseLogger
+  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger) { this._logger = logger }
+  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
+    this._logger = logger
+    this._pool = pool
+  }
 
   async query(query: string, user_id?: string, directory_id?: number) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('user_id', sql.Int, user_id)
     r.input('query', sql.VarChar, query)
 

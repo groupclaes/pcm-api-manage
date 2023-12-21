@@ -9,6 +9,6 @@ readme.md
 package-lock.json
 
 .tap/
-.dockerignore
 Dockerfile
 config.js
+index.min.js
