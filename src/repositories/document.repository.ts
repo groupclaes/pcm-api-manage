@@ -1,18 +1,18 @@
 import sql from 'mssql'
-import db from '../db'
 import { FastifyBaseLogger } from 'fastify'
-
-const DB_NAME = 'PCM'
 
 export default class Document {
   schema: string = '[document].'
   _logger: FastifyBaseLogger
+  _pool: sql.ConnectionPool
 
-  constructor(logger: FastifyBaseLogger) { this._logger = logger }
+  constructor(logger: FastifyBaseLogger, pool: sql.ConnectionPool) {
+    this._logger = logger
+    this._pool = pool
+  }
 
   async findOne(filters) {
-    const r = new sql.Request(await db.get(DB_NAME))
-
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, filters.id)
     r.input('guid', sql.UniqueIdentifier, filters.guid)
     r.input('company', sql.Char, filters.company)
@@ -34,7 +34,7 @@ export default class Document {
   }
 
   async get(id: string | number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('user_id', sql.Int, user_id)
 
     let result
@@ -64,7 +64,7 @@ export default class Document {
   }
 
   async getPreview(id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('user_id', sql.Int, user_id)
 
@@ -83,7 +83,7 @@ export default class Document {
   }
 
   async create(uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('uuid', sql.UniqueIdentifier, uuid)
     r.input('directory_id', sql.Int, directory_id)
     r.input('name', sql.VarChar, name)
@@ -110,7 +110,7 @@ export default class Document {
   }
 
   async createUpdate(id: number, uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('uuid', sql.UniqueIdentifier, uuid)
     r.input('directory_id', sql.Int, directory_id)
@@ -138,7 +138,7 @@ export default class Document {
   }
 
   async createVersion(id: number, uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('uuid', sql.UniqueIdentifier, uuid)
     r.input('directory_id', sql.Int, directory_id)
@@ -166,7 +166,7 @@ export default class Document {
   }
 
   async update(id: number, document: IDocument, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('user_id', sql.Int, user_id)
     r.input('id', sql.Int, id)
     r.input('name', sql.VarChar, document.name)
@@ -198,7 +198,7 @@ export default class Document {
   }
 
   async delete(id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('user_id', sql.Int, user_id)
 
@@ -218,7 +218,7 @@ export default class Document {
   }
 
   async getMetaDataLinks(id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('user_id', sql.Int, user_id)
 
@@ -240,7 +240,7 @@ export default class Document {
   }
 
   async postMetaDataLink(id: number, slave_id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('slaveId', sql.Int, slave_id)
     r.input('user_id', sql.Int, user_id)
@@ -263,7 +263,7 @@ export default class Document {
   }
 
   async deleteMetaDataLink(id: number, slave_id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('slaveId', sql.Int, slave_id)
     r.input('user_id', sql.Int, user_id)
@@ -284,7 +284,7 @@ export default class Document {
   }
 
   async getNextObjectId(directory_id: number, user_id?: string) {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('directoryId', sql.Int, directory_id)
     r.input('user_id', sql.Int, user_id)
 
@@ -306,7 +306,7 @@ export default class Document {
   }
 
   async itemExists(object_id: number, company_id: number): Promise<boolean> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('object_id', sql.BigInt, object_id)
     r.input('company_id', sql.Int, company_id)
 
@@ -318,7 +318,7 @@ export default class Document {
   }
 
   async getRelativePath(directory_id: number): Promise<string> {
-    const r = new sql.Request(await db.get(DB_NAME))
+    const r = new sql.Request(this._pool)
     r.input('directory_id', sql.Int, directory_id)
 
     const result = await r.query('SELECT [path] = [dbo].[GetFolderPath](@directory_id)')

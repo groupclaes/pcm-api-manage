@@ -1,6 +1,5 @@
 import Fastify from '@groupclaes/fastify-elastic'
 import multipart from '@fastify/multipart'
-import config from './config'
 import { env } from 'process'
 
 import accessLogController from './controllers/access-log.controller'
@@ -18,12 +17,10 @@ import uploadController from './controllers/upload.controller'
 
 const LOGLEVEL = 'debug'
 
-let fastify: FastifyInstance | undefined
-
-/** Main loop */
-export default async function main(): Promise<FastifyInstance> {
+export default async function (config: any): Promise<FastifyInstance | undefined> {
+  if (!config || !config.wrapper) return
   // add jwt configuration object to config since we want to force JWT
-  fastify = await Fastify({ ...config.wrapper})
+  const fastify = await Fastify({ ...config.wrapper, jwt: {} })
   const version_prefix = (env.APP_VERSION ? '/' + env.APP_VERSION : '')
   await fastify.register(multipart, {
     // file size 100Mb
@@ -46,12 +43,3 @@ export default async function main(): Promise<FastifyInstance> {
 
   return fastify
 }
-
-['SIGTERM', 'SIGINT'].forEach(signal => {
-  process.on(signal, async () => {
-    await fastify?.close()
-    process.exit(0)
-  })
-})
-
-main()
