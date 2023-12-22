@@ -3,7 +3,6 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { JWTPayload } from 'jose'
 import Search from '../repositories/search.repository'
 import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {

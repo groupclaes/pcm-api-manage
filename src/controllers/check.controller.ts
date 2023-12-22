@@ -3,7 +3,6 @@ import { JWTPayload } from 'jose'
 import Check from '../repositories/check.repository'
 import Suppliers from '../repositories/suppliers.repository'
 import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {
