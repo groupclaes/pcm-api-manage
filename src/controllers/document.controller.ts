@@ -6,7 +6,6 @@ import Document, { IDocument } from "../repositories/document.repository"
 import * as helper from '../helper'
 import Directory from "../repositories/directory.repository"
 import sql from 'mssql'
-import { env } from 'process'
 
 declare module 'fastify' {
   export interface FastifyInstance {
