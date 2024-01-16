@@ -26,7 +26,7 @@ declare module 'fastify' {
   export interface FastifyInstance {
     getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
   }
-  
+
   export interface FastifyRequest {
     jwt: JWTPayload
     hasRole: (role: string) => boolean
@@ -54,6 +54,8 @@ export default async function (fastify: FastifyInstance) {
     }
   }>, reply: FastifyReply) {
     const start = performance.now()
+
+    let error
 
     if (!request.jwt?.sub)
       return reply.fail({ jwt: 'missing authorization' }, 401)
@@ -83,6 +85,12 @@ export default async function (fastify: FastifyInstance) {
 
       let results: DBResultSet[] = []
       for await (const data of parts) {
+        // if file size is 0 skip this entry
+        if (data.file.bytesRead === 0) {
+          error = 'file has a size of 0 bytes, cannot continue'
+          continue
+        }
+
         let uuid = crypto.randomUUID()
         const _fn = `${env['DATA_PATH']}/content/${uuid.substring(0, 2)}/${uuid}/file`
 
@@ -192,6 +200,8 @@ export default async function (fastify: FastifyInstance) {
 
       if (results.length > 0 && results[0].verified) {
         return results.length > 1 ? results : results[0]
+      } else if (error) {
+        return reply.error(error, 400, performance.now() - start)
       }
       return reply.error('Session has expired!', 401, performance.now() - start)
     } catch (err) {
