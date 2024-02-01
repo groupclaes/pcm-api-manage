@@ -63,6 +63,7 @@ export default async function (fastify: FastifyInstance) {
         sub: '0',
         roles: ['admin:GroupClaes.PCM/*']
       }
+      request.hasPermission = (r, s) => true
     }
 
     if (!request.jwt?.sub)
