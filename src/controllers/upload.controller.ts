@@ -57,6 +57,8 @@ export default async function (fastify: FastifyInstance) {
 
     let error
 
+    request.log.info({ client_ip: request.headers['x-client-ip'] }, 'the client ip is')
+
     const ip_address = request.headers['x-client-ip']?.toString().split(',')[0]
     if (ip_address && ip_address === '172.18.15.9') {
       request.jwt = {
