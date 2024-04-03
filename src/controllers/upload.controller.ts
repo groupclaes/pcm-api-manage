@@ -210,7 +210,7 @@ export default async function (fastify: FastifyInstance) {
       }
 
       if (results.length > 0 && results[0].verified) {
-        return results.length > 1 ? results : results[0]
+        return reply.success(results.length > 1 ? results : results[0], 200, performance.now() - start)
       } else if (error) {
         return reply.error(error, 400, performance.now() - start)
       }
