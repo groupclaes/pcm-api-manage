@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Browse {
-  schema: string = '[manage].'
+  schema: string = 'manage.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
@@ -19,7 +19,7 @@ export default class Browse {
     r.input('query', sql.VarChar, query)
     r.input('onlyInvalid', sql.Bit, onlyInvalid)
     r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { user_id }, sqlSchema: this.schema, sqlProc: '[GetUiPageV2]' }, 'running procedure')
+    this._logger.debug({ sqlParam: { user_id }, sqlSchema: this.schema, sqlProc: 'GetUiPageV2' }, 'running procedure')
 
     const result = await r.execute('GetUiPageV2')
     this._logger.debug({ result }, 'procedure result')
@@ -51,9 +51,9 @@ export default class Browse {
     const r = new sql.Request(this._pool)
     r.input('id', sql.Int, id)
     r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { id, user_id }, sqlSchema: this.schema, sqlProc: '[GetUiBreadcrumbs]' }, 'running procedure')
+    this._logger.debug({ sqlParam: { id, user_id }, sqlSchema: this.schema, sqlProc: 'GetUiBreadcrumbs' }, 'running procedure')
 
-    const result = await r.execute('[GetUiBreadcrumbs]')
+    const result = await r.execute('GetUiBreadcrumbs')
     this._logger.debug({ result }, 'procedure result')
 
     const { error, verified } = result.recordset[0]

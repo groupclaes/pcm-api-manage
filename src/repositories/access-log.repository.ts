@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class AccessLog {
-  schema: string = '[audit].'
+  schema: string = 'audit.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
@@ -16,7 +16,7 @@ export default class AccessLog {
     r.input('user_id', sql.Int, user_id)
     this._logger.debug({ sqlParam: { user_id }, sqlSchema: this.schema, sqlProc: '[uspGetAccessLogs]' }, 'running procedure')
 
-    const result = await r.execute(this.schema + '[uspGetAccessLogs]')
+    const result = await r.execute(this.schema + 'uspGetAccessLogs')
     this._logger.debug({ result }, 'procedure result')
     
     const { error, verified } = result.recordset[0]

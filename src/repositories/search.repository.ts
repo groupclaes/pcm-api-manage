@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Search {
-  schema: string = '[search].'
+  schema: string = 'search.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
@@ -19,7 +19,7 @@ export default class Search {
     if (directory_id)
       r.input('directory_id', directory_id)
 
-    const resp = await r.execute(this.schema + '[usp_search]')
+    const resp = await r.execute(this.schema + 'usp_search')
 
     const { error, verified } = resp.recordset[0]
 

@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Document {
-  schema: string = '[document].'
+  schema: string = 'document.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
