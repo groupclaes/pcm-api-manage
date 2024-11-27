@@ -1,21 +1,22 @@
 # ---- Deps ----
-FROM --platform=linux/amd64 groupclaes/npm AS depedencies
+FROM groupclaes/npm AS depedencies
 
 # change the working directory to new exclusive app folder
 WORKDIR /usr/src/app
 
 # copy package file
-COPY package.json ./
+COPY package.json ./package.json
+COPY .npmrc ./.npmrc
 
 # install node packages
 RUN npm install --omit=dev
-
 
 # ---- Build ----
 FROM depedencies AS build
 
 # copy project
-COPY ./ ./
+COPY index.ts ./index.ts
+COPY src/ ./src
 
 # install node packages
 RUN npm install
@@ -23,9 +24,8 @@ RUN npm install
 # create esbuild package
 RUN esbuild ./index.ts --bundle --platform=node --minify --packages=external --external:'./config' --outfile=index.min.js
 
-
 # --- release ---
-FROM --platform=linux/amd64 groupclaes/node
+FROM groupclaes/node
 
 # add lib form pdf and image manipulation
 USER root

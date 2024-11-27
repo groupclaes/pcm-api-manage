@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Check {
-  schema: string = '[manage].'
+  schema: string = 'manage.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
