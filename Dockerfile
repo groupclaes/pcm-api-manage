@@ -1,5 +1,5 @@
 # ---- Deps ----
-FROM --platform=linux/amd64 groupclaes/npm AS depedencies
+FROM groupclaes/npm AS depedencies
 
 # change the working directory to new exclusive app folder
 WORKDIR /usr/src/app
@@ -25,7 +25,7 @@ RUN esbuild ./index.ts --bundle --platform=node --minify --packages=external --e
 
 
 # --- release ---
-FROM --platform=linux/amd64 groupclaes/node
+FROM groupclaes/node
 
 # add lib form pdf and image manipulation
 USER root
