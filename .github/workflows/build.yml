@@ -3,7 +3,8 @@ on:
   push:
     branches:
       - main  # The default branch
-      - v*    # The other version branches to be analyzed
+      - v4.x  # The other version branches to be analyzed
+      - test  # long-lived test branch
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
