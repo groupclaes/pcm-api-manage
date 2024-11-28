@@ -109,28 +109,15 @@ export default async function (fastify: FastifyInstance) {
         fs.mkdirSync(`${env['DATA_PATH']}/content/${uuid.substring(0, 2)}/${uuid}`, { recursive: true })
         await pump(data.file, fs.createWriteStream(_fn))
 
-        let dt: Date | undefined
-
-        if (deleteOnDirs.some(e => e == request.query.directory_id)) {
-          // try parse date
-          const fn = path.parse(data.filename).name
-          const last8 = fn.substring(fn.length - 8)
-          if (/^[0-9]{8}$/.test(last8.toLocaleLowerCase())) {
-            const year = parseInt(last8.substring(0, 4))
-            const month = parseInt(last8.substring(4, 6))
-            const day = parseInt(last8.substring(6, 8))
-
-            dt = new Date(Date.UTC(year, month - 1, day))
-          }
-        }
-
         let mimetype = data.mimetype
         let filename = data.filename
         let filesize = data.file.bytesRead
 
+        let dt = deleteOnDate(request.query.directory_id, path.parse(filename).name)
+
+        // filesize = convertImage(mimetype, filename, _fn, uuid)
         // check if the uploaded file is a jpg or png, if so convert the file to webp.
         // converted files will have an extra file in directory for safekeeping: file_source
-        //if (request.jwt.sub === '1') {
         if ([
           'image/png',
           'image/jpeg',
@@ -147,16 +134,6 @@ export default async function (fastify: FastifyInstance) {
                 lossless: true
               })
               .toBuffer()
-
-            // http://pcm.groupclaes.be/v4/i/mac/artikel/foto/ ?s=thumb_large&swp
-            // const is_smaller = buffer.length < filesize
-            // if (!is_smaller)
-            //   buffer = await sharp(_ofn)
-            //     .withMetadata()
-            //     .webp({
-            //       effort: 6
-            //     })
-            //     .toBuffer()
 
             fs.writeFileSync(_fn, buffer)
             // remove file_source
@@ -185,7 +162,6 @@ export default async function (fastify: FastifyInstance) {
             // check if the file was not deleted
           }
         }
-        //}
 
         if (!request.query.mode) {
           results.push(await repo.create(uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub))
@@ -220,4 +196,19 @@ export default async function (fastify: FastifyInstance) {
       return reply.error('failed to upload document!')
     }
   })
+}
+
+function deleteOnDate(directory_id: number, filename: string): Date | undefined {
+  if (deleteOnDirs.some(e => e == directory_id)) {
+    // try parse date
+    const last8 = filename.substring(filename.length - 8)
+    if (/^[0-9]{8}$/.test(last8.toLocaleLowerCase())) {
+      const year = parseInt(last8.substring(0, 4))
+      const month = parseInt(last8.substring(4, 6))
+      const day = parseInt(last8.substring(6, 8))
+
+      return new Date(Date.UTC(year, month - 1, day))
+    }
+  }
+  return undefined
 }
