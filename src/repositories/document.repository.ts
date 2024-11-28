@@ -38,7 +38,7 @@ export default class Document {
     r.input('user_id', sql.Int, user_id)
 
     let result
-    if (/^[{]?[0-9abcdefABCDEF]{8}-([0-99abcdefABCDEF]{4}-){3}[0-99abcdefABCDEF]{12}[}]?$/.test(id.toString(10))) {
+    if (/^[{]?[0-9abcdefABCDEF]{8}-([0-9abcdefABCDEF]{4}-){3}[0-9abcdefABCDEF]{12}[}]?$/.test(id.toString(10))) {
       r.input('guid', sql.UniqueIdentifier, id)
       result = await r.execute('[GetDocumentByGuid]')
     } else {
