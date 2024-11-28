@@ -82,8 +82,10 @@ export default class Document {
     }
   }
 
-  async create(document: IPostedDocument, user_id?: string): Promise<DBResultSet> {
+  async create(id: undefined | number, document: IPostedDocument, user_id?: string, type?: 'Version' | 'Update'): Promise<DBResultSet> {
     const r = new sql.Request(this._pool)
+    if (id !== undefined)
+      r.input('id', sql.Int, id)
     r.input('uuid', sql.UniqueIdentifier, document.uuid)
     r.input('directory_id', sql.Int, document.directory_id)
     r.input('name', sql.VarChar, document.name)
@@ -94,63 +96,7 @@ export default class Document {
     r.input('deleted_on', sql.DateTime, document.deleted_on)
     r.input('user_id', sql.Int, user_id)
 
-    const result = await r.execute(`${this.schema}usp_create`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1][0].id || []
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async createUpdate(id: number, document: IPostedDocument, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('id', sql.Int, id)
-    r.input('uuid', sql.UniqueIdentifier, document.uuid)
-    r.input('directory_id', sql.Int, document.directory_id)
-    r.input('name', sql.VarChar, document.name)
-    r.input('mime_type', sql.VarChar, document.mime_type)
-    r.input('size', sql.BigInt, document.size)
-    r.input('object_type', sql.VarChar, document.object_type)
-    r.input('document_type', sql.VarChar, document.document_type)
-    r.input('deleted_on', sql.DateTime, document.deleted_on)
-    r.input('user_id', sql.Int, user_id)
-
-    const result = await r.execute(`${this.schema}usp_createUpdate`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1]
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async createVersion(id: number, document: IPostedDocument, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('id', sql.Int, id)
-    r.input('uuid', sql.UniqueIdentifier, document.uuid)
-    r.input('directory_id', sql.Int, document.directory_id)
-    r.input('name', sql.VarChar, document.name)
-    r.input('mime_type', sql.VarChar, document.mime_type)
-    r.input('size', sql.BigInt, document.size)
-    r.input('object_type', sql.VarChar, document.object_type)
-    r.input('document_type', sql.VarChar, document.document_type)
-    r.input('deleted_on', sql.DateTime, document.deleted_on)
-    r.input('user_id', sql.Int, user_id)
-
-    const result = await r.execute(`${this.schema}usp_createVersion`)
+    const result = await r.execute(`${this.schema}usp_create${type ?? ''}`)
 
     const { error, verified } = result.recordset[0]
 

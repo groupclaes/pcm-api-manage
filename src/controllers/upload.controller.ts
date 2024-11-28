@@ -175,11 +175,11 @@ export default async function (fastify: FastifyInstance) {
         }
 
         if (!request.query.mode) {
-          results.push(await repo.create(document, request.jwt.sub))
+          results.push(await repo.create(undefined, document, request.jwt.sub))
         } else if (request.query.id) {
           switch (request.query.mode) {
             case 'update':
-              const result = await repo.createUpdate(request.query.id, document, request.jwt.sub)
+              const result = await repo.create(request.query.id, document, request.jwt.sub, 'Update')
               if (result.result.length > 0) {
                 const _ouuid = result.result[0].guid.toLocaleLowerCase()
                 const _ofn = `${env['DATA_PATH']}/content/${_ouuid.substring(0, 2)}/${_ouuid}/file`
@@ -190,7 +190,7 @@ export default async function (fastify: FastifyInstance) {
               break
 
             case 'version':
-              results.push(await repo.createVersion(request.query.id, document, request.jwt.sub))
+              results.push(await repo.create(request.query.id, document, request.jwt.sub, 'Version'))
               break
           }
         }
