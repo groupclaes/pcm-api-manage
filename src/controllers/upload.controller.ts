@@ -113,7 +113,7 @@ export default async function (fastify: FastifyInstance) {
         let filename = data.filename
         let filesize = data.file.bytesRead
 
-        let dt = deleteOnDate(request.query.directory_id, path.parse(filename).name)
+        const dt = deleteOnDate(request.query.directory_id, path.parse(filename).name)
 
         // filesize = convertImage(mimetype, filename, _fn, uuid)
         // check if the uploaded file is a jpg or png, if so convert the file to webp.
