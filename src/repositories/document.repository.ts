@@ -38,7 +38,7 @@ export default class Document {
     r.input('user_id', sql.Int, user_id)
 
     let result
-    if (new RegExp('^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$').test(id.toString(10))) {
+    if (/^[{]?[0-9abcdefABCDEF]{8}-([0-99abcdefABCDEF]{4}-){3}[0-99abcdefABCDEF]{12}[}]?$/.test(id.toString(10))) {
       r.input('guid', sql.UniqueIdentifier, id)
       result = await r.execute('[GetDocumentByGuid]')
     } else {
@@ -312,9 +312,7 @@ export default class Document {
 
     const result = await r.query('SELECT [count] = COUNT(*) FROM items WHERE Id = @object_id AND CompanyId = @company_id')
 
-    if (result.recordset[0] && result.recordset[0].count)
-      return result.recordset[0].count > 0
-    return false
+    return result.recordset[0]?.count > 0 || false
   }
 
   async getRelativePath(directory_id: number): Promise<string> {
