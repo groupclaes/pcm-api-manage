@@ -12,7 +12,7 @@ FROM depedencies AS build
 COPY index.ts ./index.ts
 COPY src/ ./src
 
-RUN npm install --ignore-scripts && esbuild ./index.ts --bundle --platform=node --minify --packages=external --external:'./config' --outfile=index.min.js
+RUN npm install --ignore-scripts && npm run build
 
 # ---- final ----
 FROM groupclaes/node:latest
