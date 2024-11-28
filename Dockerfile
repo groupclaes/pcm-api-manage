@@ -1,5 +1,5 @@
 # ---- deps ----
-FROM groupclaes/npm AS depedencies
+FROM groupclaes/npm:10 AS depedencies
 WORKDIR /usr/src/app
 
 COPY package.json ./package.json
@@ -15,7 +15,7 @@ COPY src/ ./src
 RUN npm install --ignore-scripts && npm run build
 
 # ---- final ----
-FROM groupclaes/node:latest
+FROM groupclaes/node:20
 # add lib form pdf and image manipulation
 USER root
 RUN apk add --no-cache file imagemagick

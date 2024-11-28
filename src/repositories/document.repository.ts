@@ -38,7 +38,7 @@ export default class Document {
     r.input('user_id', sql.Int, user_id)
 
     let result
-    if (/^[{]?[0-9abcdefABCDEF]{8}-([0-9abcdefABCDEF]{4}-){3}[0-9abcdefABCDEF]{12}[}]?$/.test(id.toString(10))) {
+    if (/^{?[0-9abcdefABCDEF]{8}-([0-9abcdefABCDEF]{4}-){3}[0-9abcdefABCDEF]{12}}?$/.test(id.toString(10))) {
       r.input('guid', sql.UniqueIdentifier, id)
       result = await r.execute('[GetDocumentByGuid]')
     } else {
@@ -82,75 +82,21 @@ export default class Document {
     }
   }
 
-  async create(uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
+  async create(id: undefined | number, document: IPostedDocument, user_id?: string, type?: 'Version' | 'Update'): Promise<DBResultSet> {
     const r = new sql.Request(this._pool)
-    r.input('uuid', sql.UniqueIdentifier, uuid)
-    r.input('directory_id', sql.Int, directory_id)
-    r.input('name', sql.VarChar, name)
-    r.input('mime_type', sql.VarChar, mime_type)
-    r.input('size', sql.BigInt, size)
-    r.input('object_type', sql.VarChar, object_type)
-    r.input('document_type', sql.VarChar, document_type)
-    r.input('deleted_on', sql.DateTime, deleted_on)
+    if (id !== undefined)
+      r.input('id', sql.Int, id)
+    r.input('uuid', sql.UniqueIdentifier, document.uuid)
+    r.input('directory_id', sql.Int, document.directory_id)
+    r.input('name', sql.VarChar, document.name)
+    r.input('mime_type', sql.VarChar, document.mime_type)
+    r.input('size', sql.BigInt, document.size)
+    r.input('object_type', sql.VarChar, document.object_type)
+    r.input('document_type', sql.VarChar, document.document_type)
+    r.input('deleted_on', sql.DateTime, document.deleted_on)
     r.input('user_id', sql.Int, user_id)
 
-    const result = await r.execute(`${this.schema}usp_create`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1][0].id || []
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async createUpdate(id: number, uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('id', sql.Int, id)
-    r.input('uuid', sql.UniqueIdentifier, uuid)
-    r.input('directory_id', sql.Int, directory_id)
-    r.input('name', sql.VarChar, name)
-    r.input('mime_type', sql.VarChar, mime_type)
-    r.input('size', sql.BigInt, size)
-    r.input('object_type', sql.VarChar, object_type)
-    r.input('document_type', sql.VarChar, document_type)
-    r.input('deleted_on', sql.DateTime, deleted_on)
-    r.input('user_id', sql.Int, user_id)
-
-    const result = await r.execute(`${this.schema}usp_createUpdate`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1]
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async createVersion(id: number, uuid: string, directory_id: number, name: string, mime_type: string, size: number, object_type: string, document_type: string, deleted_on: Date | undefined, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('id', sql.Int, id)
-    r.input('uuid', sql.UniqueIdentifier, uuid)
-    r.input('directory_id', sql.Int, directory_id)
-    r.input('name', sql.VarChar, name)
-    r.input('mime_type', sql.VarChar, mime_type)
-    r.input('size', sql.BigInt, size)
-    r.input('object_type', sql.VarChar, object_type)
-    r.input('document_type', sql.VarChar, document_type)
-    r.input('deleted_on', sql.DateTime, deleted_on)
-    r.input('user_id', sql.Int, user_id)
-
-    const result = await r.execute(`${this.schema}usp_createVersion`)
+    const result = await r.execute(`${this.schema}usp_create${type ?? ''}`)
 
     const { error, verified } = result.recordset[0]
 
@@ -365,4 +311,15 @@ export interface IDocument {
   languages?: number[]
   objectIds?: number[]
   attributes?: number[]
+}
+
+export interface IPostedDocument{
+  uuid: string
+  directory_id: number
+  name: string
+  mime_type: string
+  size: number
+  object_type: string
+  document_type: string
+  deleted_on: Date | undefined
 }

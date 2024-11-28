@@ -1,3 +1,5 @@
-# Manage PCM api contains all controllers for the management ui available on pcm.groupclaes.be
+# Management API for PCM [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=groupclaes_pcm-api-manage&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=groupclaes_pcm-api-manage) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=groupclaes_pcm-api-manage&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=groupclaes_pcm-api-manage) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=groupclaes_pcm-api-manage&metric=bugs)](https://sonarcloud.io/summary/new_code?id=groupclaes_pcm-api-manage) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=groupclaes_pcm-api-manage&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=groupclaes_pcm-api-manage)
+
+This api contains all controllers for the management interface available on https://pcm.groupclaes.be/
 
 added jose, check JWT token using JWKS, on ISSUER
