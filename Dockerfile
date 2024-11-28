@@ -23,7 +23,8 @@ RUN apk add --no-cache file imagemagick
 USER node
 WORKDIR /usr/src/app
 
-COPY --chown=node:node --from=depedencies /usr/src/app ./
-COPY --chown=node:node --from=build /usr/src/app/index.min.js ./
+# removed --chown=node:node
+COPY --from=depedencies /usr/src/app ./
+COPY --from=build /usr/src/app/index.min.js ./
 
 CMD ["node","index.min.js"]
