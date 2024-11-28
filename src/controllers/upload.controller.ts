@@ -18,7 +18,7 @@ const deleteOnDirs = [
   231
 ]
 
-import Document, { DBResultSet } from '../repositories/document.repository'
+import Document, { DBResultSet, IPostedDocument } from '../repositories/document.repository'
 import sql from 'mssql'
 import { env } from 'process'
 
@@ -163,12 +163,23 @@ export default async function (fastify: FastifyInstance) {
           }
         }
 
+        const document: IPostedDocument = {
+          uuid,
+          directory_id: request.query.directory_id,
+          name: filename,
+          mime_type: mimetype,
+          size: filesize,
+          object_type,
+          document_type,
+          deleted_on: dt
+        }
+
         if (!request.query.mode) {
-          results.push(await repo.create(uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub))
+          results.push(await repo.create(document, request.jwt.sub))
         } else if (request.query.id) {
           switch (request.query.mode) {
             case 'update':
-              const result = await repo.createUpdate(request.query.id, uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub)
+              const result = await repo.createUpdate(request.query.id, document, request.jwt.sub)
               if (result.result.length > 0) {
                 const _ouuid = result.result[0].guid.toLocaleLowerCase()
                 const _ofn = `${env['DATA_PATH']}/content/${_ouuid.substring(0, 2)}/${_ouuid}/file`
@@ -179,7 +190,7 @@ export default async function (fastify: FastifyInstance) {
               break
 
             case 'version':
-              results.push(await repo.createVersion(request.query.id, uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub))
+              results.push(await repo.createVersion(request.query.id, document, request.jwt.sub))
               break
           }
         }
@@ -202,7 +213,7 @@ function deleteOnDate(directory_id: number, filename: string): Date | undefined 
   if (deleteOnDirs.some(e => e == directory_id)) {
     // try parse date
     const last8 = filename.substring(filename.length - 8)
-    if (/^[0-9]{8}$/.test(last8.toLocaleLowerCase())) {
+    if (/^\d{8}$/.test(last8.toLocaleLowerCase())) {
       const year = parseInt(last8.substring(0, 4))
       const month = parseInt(last8.substring(4, 6))
       const day = parseInt(last8.substring(6, 8))
