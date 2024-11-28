@@ -4,7 +4,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Directory {
-  schema: string = '[directory].'
+  schema: string = 'directory.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 

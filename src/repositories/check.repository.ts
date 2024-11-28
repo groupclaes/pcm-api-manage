@@ -2,7 +2,7 @@ import sql from 'mssql'
 import { FastifyBaseLogger } from 'fastify'
 
 export default class Check {
-  schema: string = '[manage].'
+  schema: string = 'manage.'
   _logger: FastifyBaseLogger
   _pool: sql.ConnectionPool
 
@@ -60,7 +60,7 @@ const csvBuilder = (item) => {
   return lines.join('\n')
 }
 
-const stringBuilder = (item: undefined | any, document: undefined | any): string => {
+const stringBuilder = (item: undefined | { itemNum: string, description: string, shipperItemNum: string, ean: string }, document: undefined | { name: string }): string => {
   if (item)
     return item.itemNum + ';' + item.description + ';' + item.shipperItemNum + ';' + item.ean + ';' + ((document) ? document.name + ';' : ';')
 

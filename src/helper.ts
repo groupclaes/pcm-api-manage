@@ -110,11 +110,3 @@ const BitConverter = {
       | src[index + 7]
   }
 }
-
-export interface IBaseAPIResponse {
-  status: 'error' | 'success' | 'fail'
-  code?: number // HTTP status code
-  message?: string // Required when status is 'error'
-  data?: { [key: string]: any } | any // Required if status is 'success' or 'fail', data should never be an array
-  executionTime?: number // Optional: Execution time in milliseconds
-}
