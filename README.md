@@ -25,6 +25,6 @@ This api contains all controllers for the management interface available on http
 - /search
   - GET / #execute search query
 - /upload
-  -
+  - POST / #upload content to PCM
 - /users
   - GET / #retrieve list of users known in DB
