@@ -56,17 +56,7 @@ export default async function (fastify: FastifyInstance) {
     const start = performance.now()
 
     let error
-
-    request.log.info({ client_ip: request.headers['x-client-ip'] }, 'the client ip is')
-
-    const ip_address = request.headers['x-client-ip']?.toString().split(',')[0]
-    if (ip_address && ip_address === '172.18.15.9') {
-      request.jwt = {
-        sub: '0',
-        roles: ['admin:GroupClaes.PCM/*']
-      }
-      request.hasPermission = (r, s) => true
-    }
+    checkIfDevserver(request)
 
     if (!request.jwt?.sub)
       return reply.fail({ jwt: 'missing authorization' }, 401)
@@ -222,4 +212,17 @@ function deleteOnDate(directory_id: number, filename: string): Date | undefined 
     }
   }
   return undefined
+}
+
+function checkIfDevserver(request: FastifyRequest) {
+  const ip_address = request.headers['x-client-ip']?.toString().split(',')[0]
+  request.log.info({ client_ip: ip_address }, 'checkIfDevserver')
+
+  if (ip_address && ip_address === '172.18.15.9') {
+    request.jwt = {
+      sub: '0',
+      roles: ['admin:GroupClaes.PCM/*']
+    }
+    request.hasPermission = (r, s) => true
+  }
 }
