@@ -168,7 +168,7 @@ export default async function (fastify: FastifyInstance) {
           results.push(await repo.create(undefined, document, request.jwt.sub))
         } else if (request.query.id) {
           switch (request.query.mode) {
-            case 'update':
+            case 'update': {
               const result = await repo.create(request.query.id, document, request.jwt.sub, 'Update')
               if (result.result.length > 0) {
                 const _ouuid = result.result[0].guid.toLocaleLowerCase()
@@ -178,7 +178,7 @@ export default async function (fastify: FastifyInstance) {
               }
               results.push(result)
               break
-
+            }
             case 'version':
               results.push(await repo.create(request.query.id, document, request.jwt.sub, 'Version'))
               break
