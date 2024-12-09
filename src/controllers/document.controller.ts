@@ -6,7 +6,6 @@ import Document, { IDocument } from "../repositories/document.repository"
 import * as helper from '../helper'
 import Directory from "../repositories/directory.repository"
 import sql from 'mssql'
-import Browse from '../repositories/browse.repository'
 
 declare module 'fastify' {
   export interface FastifyInstance {
@@ -46,7 +45,6 @@ export default async function (fastify: FastifyInstance) {
     try {
       const pool = await fastify.getSqlPool()
       const repo = new Document(request.log, pool)
-      const browse_repo = new Browse(request.log, pool)
       const mode = request.query.mode ?? 'full'
       const result: any = (mode === 'preview') ? await repo.getPreview(request.params.id, request.jwt.sub) : await repo.get(request.params.id, request.jwt.sub)
       if (result.error) return reply.error(result.error)
