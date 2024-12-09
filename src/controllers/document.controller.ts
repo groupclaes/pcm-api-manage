@@ -89,12 +89,14 @@ export default async function (fastify: FastifyInstance) {
             result.result.hasLargeImage = helper.fileDate(result.result.guid, 'image_large')
           }
         }
-        const breadcrumbs = await browse_repo.getBreadcrumbs(result.result.directoryId, request.jwt.sub)
-        
-        return reply.success({
-          document: result.result,
-          breadcrumbs: breadcrumbs.breadcrumbs
-        }, 200, performance.now() - start)
+
+        let response: { document: any, breadcrumbs?: any } = {
+          document: result.result
+        }
+        if (result.breadcrumbs)
+          response.breadcrumbs = result.breadcrumbs
+
+        return reply.success(response, 200, performance.now() - start)
       }
 
       return reply.error('Session has expired!', 401, performance.now() - start)

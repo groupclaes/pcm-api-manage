@@ -53,7 +53,8 @@ export default class Document {
         return {
           error,
           verified,
-          result: result.recordsets[1][0][0] || []
+          result: result.recordsets[1][0][0] || [],
+          breadcrumbs: result.recordsets[2][0] || []
         }
       } else {
         throw new Error(error)
