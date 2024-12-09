@@ -18,7 +18,7 @@ const deleteOnDirs = [
   231
 ]
 
-import Document, { DBResultSet } from '../repositories/document.repository'
+import Document, { DBResultSet, IPostedDocument } from '../repositories/document.repository'
 import sql from 'mssql'
 import { env } from 'process'
 
@@ -56,17 +56,7 @@ export default async function (fastify: FastifyInstance) {
     const start = performance.now()
 
     let error
-
-    request.log.info({ client_ip: request.headers['x-client-ip'] }, 'the client ip is')
-
-    const ip_address = request.headers['x-client-ip']?.toString().split(',')[0]
-    if (ip_address && ip_address === '172.18.15.9') {
-      request.jwt = {
-        sub: '0',
-        roles: ['admin:GroupClaes.PCM/*']
-      }
-      request.hasPermission = (r, s) => true
-    }
+    checkIfDevserver(request)
 
     if (!request.jwt?.sub)
       return reply.fail({ jwt: 'missing authorization' }, 401)
@@ -109,28 +99,15 @@ export default async function (fastify: FastifyInstance) {
         fs.mkdirSync(`${env['DATA_PATH']}/content/${uuid.substring(0, 2)}/${uuid}`, { recursive: true })
         await pump(data.file, fs.createWriteStream(_fn))
 
-        let dt: Date | undefined
-
-        if (deleteOnDirs.some(e => e == request.query.directory_id)) {
-          // try parse date
-          const fn = path.parse(data.filename).name
-          const last8 = fn.substring(fn.length - 8)
-          if (/^[0-9]{8}$/.test(last8.toLocaleLowerCase())) {
-            const year = parseInt(last8.substring(0, 4))
-            const month = parseInt(last8.substring(4, 6))
-            const day = parseInt(last8.substring(6, 8))
-
-            dt = new Date(Date.UTC(year, month - 1, day))
-          }
-        }
-
         let mimetype = data.mimetype
         let filename = data.filename
         let filesize = data.file.bytesRead
 
+        const dt = deleteOnDate(request.query.directory_id, path.parse(filename).name)
+
+        // filesize = convertImage(mimetype, filename, _fn, uuid)
         // check if the uploaded file is a jpg or png, if so convert the file to webp.
         // converted files will have an extra file in directory for safekeeping: file_source
-        //if (request.jwt.sub === '1') {
         if ([
           'image/png',
           'image/jpeg',
@@ -147,16 +124,6 @@ export default async function (fastify: FastifyInstance) {
                 lossless: true
               })
               .toBuffer()
-
-            // http://pcm.groupclaes.be/v4/i/mac/artikel/foto/ ?s=thumb_large&swp
-            // const is_smaller = buffer.length < filesize
-            // if (!is_smaller)
-            //   buffer = await sharp(_ofn)
-            //     .withMetadata()
-            //     .webp({
-            //       effort: 6
-            //     })
-            //     .toBuffer()
 
             fs.writeFileSync(_fn, buffer)
             // remove file_source
@@ -185,14 +152,24 @@ export default async function (fastify: FastifyInstance) {
             // check if the file was not deleted
           }
         }
-        //}
+
+        const document: IPostedDocument = {
+          uuid,
+          directory_id: request.query.directory_id,
+          name: filename,
+          mime_type: mimetype,
+          size: filesize,
+          object_type,
+          document_type,
+          deleted_on: dt
+        }
 
         if (!request.query.mode) {
-          results.push(await repo.create(uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub))
+          results.push(await repo.create(undefined, document, request.jwt.sub))
         } else if (request.query.id) {
           switch (request.query.mode) {
-            case 'update':
-              const result = await repo.createUpdate(request.query.id, uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub)
+            case 'update': {
+              const result = await repo.create(request.query.id, document, request.jwt.sub, 'Update')
               if (result.result.length > 0) {
                 const _ouuid = result.result[0].guid.toLocaleLowerCase()
                 const _ofn = `${env['DATA_PATH']}/content/${_ouuid.substring(0, 2)}/${_ouuid}/file`
@@ -201,9 +178,9 @@ export default async function (fastify: FastifyInstance) {
               }
               results.push(result)
               break
-
+            }
             case 'version':
-              results.push(await repo.createVersion(request.query.id, uuid, request.query.directory_id, filename, mimetype, filesize, object_type, document_type, dt, request.jwt.sub))
+              results.push(await repo.create(request.query.id, document, request.jwt.sub, 'Version'))
               break
           }
         }
@@ -220,4 +197,32 @@ export default async function (fastify: FastifyInstance) {
       return reply.error('failed to upload document!')
     }
   })
+}
+
+function deleteOnDate(directory_id: number, filename: string): Date | undefined {
+  if (deleteOnDirs.some(e => e == directory_id)) {
+    // try parse date
+    const last8 = filename.substring(filename.length - 8)
+    if (/^\d{8}$/.test(last8.toLocaleLowerCase())) {
+      const year = parseInt(last8.substring(0, 4))
+      const month = parseInt(last8.substring(4, 6))
+      const day = parseInt(last8.substring(6, 8))
+
+      return new Date(Date.UTC(year, month - 1, day))
+    }
+  }
+  return undefined
+}
+
+function checkIfDevserver(request: FastifyRequest) {
+  const ip_address = request.headers['x-client-ip']?.toString().split(',')[0]
+  request.log.info({ client_ip: ip_address }, 'checkIfDevserver')
+
+  if (ip_address && ip_address === '172.18.15.9') {
+    request.jwt = {
+      sub: '0',
+      roles: ['admin:GroupClaes.PCM/*']
+    }
+    request.hasPermission = (r, s) => true
+  }
 }

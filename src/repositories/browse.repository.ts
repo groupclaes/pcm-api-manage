@@ -32,7 +32,8 @@ export default class Browse {
         verified,
         result: {
           directories: result.recordsets[1][0] || [],
-          documents: result.recordsets[2][0] || []
+          documents: result.recordsets[2][0] || [],
+          breadcrumbs: result.recordsets[3][0] || []
         }
       }
     } else {

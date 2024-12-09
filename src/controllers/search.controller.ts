@@ -24,8 +24,8 @@ declare module 'fastify' {
 
 export default async function (fastify: FastifyInstance) {
   /**
-   * Get all attribute entries from DB
-   * @route GET /{APP_VERSION}/manage/languages
+   * Search
+   * @route GET /{APP_VERSION}/manage/search
    */
   fastify.get('', async function (request: FastifyRequest<{
     Querystring: {

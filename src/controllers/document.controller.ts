@@ -88,7 +88,13 @@ export default async function (fastify: FastifyInstance) {
           }
         }
 
-        return reply.success({ document: result.result }, 200, performance.now() - start)
+        let response: { document: any, breadcrumbs?: any } = {
+          document: result.result
+        }
+        if (result.breadcrumbs)
+          response.breadcrumbs = result.breadcrumbs
+
+        return reply.success(response, 200, performance.now() - start)
       }
 
       return reply.error('Session has expired!', 401, performance.now() - start)
