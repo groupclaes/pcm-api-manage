@@ -1,26 +1,9 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify"
-import { JWTPayload } from "jose"
+// External dependencies
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+
+// Internal deps
 import { IRepositoryBooleanResult } from "../repositories"
 import Directory from "../repositories/directory.repository"
-import sql from 'mssql'
-
-declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
-  
-  export interface FastifyRequest {
-    jwt: JWTPayload
-    hasRole: (role: string) => boolean
-    hasPermission: (permission: string, scope?: string) => boolean
-  }
-
-  export interface FastifyReply {
-    success: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    fail: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    error: (message?: string, code?: number, executionTime?: number) => FastifyReply
-  }
-}
 
 export default async function (fastify: FastifyInstance) {
   /**
