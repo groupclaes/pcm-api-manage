@@ -155,7 +155,7 @@ export default class Directory {
       return {
         error,
         verified,
-        result: result.recordsets[1][0] || false
+        result: result.rowsAffected[1] > 0
       }
     } else {
       throw new Error(error)
@@ -175,7 +175,7 @@ export default class Directory {
       return {
         error,
         verified,
-        result: result.recordsets[1][0] || false
+        result: result.rowsAffected[1] > 0
       }
     } else {
       throw new Error(error)
