@@ -27,7 +27,11 @@ export default async function (fastify: FastifyInstance) {
       if (result.verified) {
         if (result.error) return reply.error(result.error)
 
-        return reply.success({ dashboard: result.result })
+        return reply.success({
+          dashboard: result.result.recent_posts,
+          watched_directories: result.result.watched_directories,
+          watched_directories_posts: result.result.watched_directories_posts
+        })
       }
       return reply.error('Session has expired!', 401, performance.now() - start)
     } catch (err) {

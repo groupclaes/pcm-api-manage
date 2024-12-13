@@ -25,7 +25,11 @@ export default class Profile {
       return {
         error,
         verified,
-        result: result.recordsets[1] || []
+        result: {
+          recent_posts: result.recordsets[1] || [],
+          watched_directories: result.recordsets[2] || [],
+          watched_directories_posts: result.recordsets[3] || []
+        }
       }
     } else {
       throw new Error(error)
