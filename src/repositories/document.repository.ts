@@ -271,66 +271,6 @@ export default class Document {
     const { path } = result.recordset[0]
     return path
   }
-
-  async getWatched(directory_id: number, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('user_id', sql.Int, user_id)
-    r.input('directory_id', sql.Int, directory_id)
-
-    const result = await r.execute(`${this.schema}uspGetWatchedDirectories`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1] || []
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async watch(directory_id: number, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('user_id', sql.Int, user_id)
-    r.input('directory_id', sql.Int, directory_id)
-
-    const result = await r.execute(`${this.schema}uspAddWatchedDirecotry`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1][0] || false
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  async unwatch(directory_id: number, user_id?: string): Promise<DBResultSet> {
-    const r = new sql.Request(this._pool)
-    r.input('user_id', sql.Int, user_id)
-    r.input('directory_id', sql.Int, directory_id)
-
-    const result = await r.execute(`${this.schema}uspRemoveWatchedDirectory`)
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        result: result.recordsets[1][0] || false
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
 }
 
 export interface DBResultSet {

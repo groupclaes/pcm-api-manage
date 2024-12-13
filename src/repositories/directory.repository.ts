@@ -121,4 +121,64 @@ export default class Directory {
       result: result.recordsets[1][0] || []
     }
   }
+
+  async getWatched(id: number, user_id?: string): Promise<IRepositoryResult> {
+    const r = new sql.Request(this._pool)
+    r.input('user_id', sql.Int, user_id)
+    r.input('directory_id', sql.Int, id)
+
+    const result = await r.execute(`${this.schema}uspGetWatchedDirectories`)
+
+    const { error, verified } = result.recordset[0]
+
+    if (!error) {
+      return {
+        error,
+        verified,
+        result: result.recordsets[1] || []
+      }
+    } else {
+      throw new Error(error)
+    }
+  }
+
+  async watch(id: number, user_id?: string): Promise<IRepositoryResult> {
+    const r = new sql.Request(this._pool)
+    r.input('user_id', sql.Int, user_id)
+    r.input('directory_id', sql.Int, id)
+
+    const result = await r.execute(`${this.schema}uspAddWatchedDirecotry`)
+
+    const { error, verified } = result.recordset[0]
+
+    if (!error) {
+      return {
+        error,
+        verified,
+        result: result.recordsets[1][0] || false
+      }
+    } else {
+      throw new Error(error)
+    }
+  }
+
+  async unwatch(id: number, user_id?: string): Promise<IRepositoryResult> {
+    const r = new sql.Request(this._pool)
+    r.input('user_id', sql.Int, user_id)
+    r.input('directory_id', sql.Int, id)
+
+    const result = await r.execute(`${this.schema}uspRemoveWatchedDirectory`)
+
+    const { error, verified } = result.recordset[0]
+
+    if (!error) {
+      return {
+        error,
+        verified,
+        result: result.recordsets[1][0] || false
+      }
+    } else {
+      throw new Error(error)
+    }
+  }
 }
