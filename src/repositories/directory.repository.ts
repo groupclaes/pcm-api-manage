@@ -122,10 +122,9 @@ export default class Directory {
     }
   }
 
-  async getWatched(id: number, user_id?: string): Promise<IRepositoryResult> {
+  async getWatched(user_id?: string): Promise<IRepositoryResult> {
     const r = new sql.Request(this._pool)
     r.input('user_id', sql.Int, user_id)
-    r.input('directory_id', sql.Int, id)
 
     const result = await r.execute(`account.uspGetWatchedDirectories`)
 

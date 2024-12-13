@@ -160,7 +160,7 @@ export default async function (fastify: FastifyInstance) {
     try {
       const pool = await fastify.getSqlPool()
       const repo = new Directory(request.log, pool)
-      const result = await repo.getWatched(request.params.id, request.jwt.sub)
+      const result = await repo.getWatched(request.jwt.sub)
 
       if (result.verified) {
         if (result.error) return reply.error(result.error)
@@ -193,7 +193,7 @@ export default async function (fastify: FastifyInstance) {
       if (result.verified) {
         if (result.error) return reply.error(result.error)
 
-        return reply.success(null, 200, performance.now() - start)
+        return reply.success({ success: result.result }, 200, performance.now() - start)
       }
 
       return reply.error('Session has expired!', 401, performance.now() - start)
@@ -226,7 +226,7 @@ export default async function (fastify: FastifyInstance) {
       if (result.verified) {
         if (result.error) return reply.error(result.error)
 
-        return reply.success(null, 200, performance.now() - start)
+        return reply.success({ success: result.result }, 200, performance.now() - start)
       }
 
       return reply.error('Session has expired!', 401, performance.now() - start)
