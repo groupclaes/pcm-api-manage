@@ -2,9 +2,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 
 // Internal deps
-import { IRepositoryBooleanResult } from "../repositories"
-import Directory from "../repositories/directory.repository"
-
+import { IRepositoryBooleanResult } from '../repositories'
+import Directory from '../repositories/directory.repository'
 export default async function (fastify: FastifyInstance) {
   /**
    * @route GET /{APP_VERSION}/directories
@@ -142,6 +141,101 @@ export default async function (fastify: FastifyInstance) {
     } catch (err) {
       request.log.error({ err }, 'failed to delete directory!')
       return reply.error('failed to delete directory!')
+    }
+  })
+
+
+  /**
+   * Watched directories routes
+   */
+  fastify.get('/watched', async function (request: FastifyRequest<{
+    Params: { id: number }
+  }>, reply: FastifyReply) {
+    const start = performance.now()
+
+    if (!request.jwt?.sub)
+      return reply.fail({ jwt: 'missing authorization' }, 401)
+
+    if (!request.hasPermission('read', 'GroupClaes.PCM/directory/watch'))
+      return reply.fail({ role: 'missing permission' }, 403)
+
+
+    try {
+      const pool = await fastify.getSqlPool()
+      const repo = new Directory(request.log, pool)
+      const result = await repo.getWatched(request.params.id, request.jwt.sub)
+
+      if (result.verified) {
+        if (result.error) return reply.error(result.error)
+
+        return reply.success({ directories: result.result }, 200, performance.now() - start)
+      }
+
+      return reply.error('Session has expired!', 401, performance.now() - start)
+    } catch (err) {
+      request.log.error({ err }, 'failed to watch directory!')
+      return reply.error('failed to watch directory!')
+    }
+  })
+  fastify.put('/:id/watch', async function (request: FastifyRequest<{
+    Params: { id: number }
+  }>, reply: FastifyReply) {
+    const start = performance.now()
+
+    if (!request.jwt?.sub)
+      return reply.fail({ jwt: 'missing authorization' }, 401)
+
+    if (!request.hasPermission('write', 'GroupClaes.PCM/directory/watch'))
+      return reply.fail({ role: 'missing permission' }, 403)
+
+    try {
+      const pool = await fastify.getSqlPool()
+      const repo = new Directory(request.log, pool)
+      const result = await repo.watch(request.params.id, request.jwt.sub)
+
+      if (result.verified) {
+        if (result.error) return reply.error(result.error)
+
+        return reply.success(null, 200, performance.now() - start)
+      }
+
+      return reply.error('Session has expired!', 401, performance.now() - start)
+    } catch (err) {
+      request.log.error({ err }, 'failed to watch directory!')
+      return reply.error('failed to watch directory!')
+    }
+  })
+
+
+  /**
+   * Watched directories routes
+   */
+  fastify.put('/:id/unwatch', async function (request: FastifyRequest<{
+    Params: { id: number }
+  }>, reply: FastifyReply) {
+    const start = performance.now()
+
+    if (!request.jwt?.sub)
+      return reply.fail({ jwt: 'missing authorization' }, 401)
+
+    if (!request.hasPermission('write', 'GroupClaes.PCM/directory/watch'))
+      return reply.fail({ role: 'missing permission' }, 403)
+
+    try {
+      const pool = await fastify.getSqlPool()
+      const repo = new Directory(request.log, pool)
+      const result = await repo.unwatch(request.params.id, request.jwt.sub)
+
+      if (result.verified) {
+        if (result.error) return reply.error(result.error)
+
+        return reply.success(null, 200, performance.now() - start)
+      }
+
+      return reply.error('Session has expired!', 401, performance.now() - start)
+    } catch (err) {
+      request.log.error({ err }, 'failed to unwatch directory!')
+      return reply.error('failed to unwatch directory!')
     }
   })
 }
