@@ -54,7 +54,7 @@ export default class Document {
           error,
           verified,
           result: result.recordsets[1][0][0] || [],
-          breadcrumbs: result.recordsets[2][0] || []
+          breadcrumbs: result.recordsets[2] || []
         }
       } else {
         throw new Error(error)
@@ -314,7 +314,7 @@ export interface IDocument {
   attributes?: number[]
 }
 
-export interface IPostedDocument{
+export interface IPostedDocument {
   uuid: string
   directory_id: number
   name: string
