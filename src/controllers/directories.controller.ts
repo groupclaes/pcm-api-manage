@@ -144,13 +144,10 @@ export default async function (fastify: FastifyInstance) {
     }
   })
 
-
   /**
    * Watched directories routes
    */
-  fastify.get('/watched', async function (request: FastifyRequest<{
-    Params: { id: number }
-  }>, reply: FastifyReply) {
+  fastify.get('/watched', async function (request: FastifyRequest, reply: FastifyReply) {
     const start = performance.now()
 
     if (!request.jwt?.sub)

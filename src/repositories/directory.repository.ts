@@ -127,7 +127,7 @@ export default class Directory {
     r.input('user_id', sql.Int, user_id)
     r.input('directory_id', sql.Int, id)
 
-    const result = await r.execute(`${this.schema}uspGetWatchedDirectories`)
+    const result = await r.execute(`account.uspGetWatchedDirectories`)
 
     const { error, verified } = result.recordset[0]
 
@@ -147,7 +147,7 @@ export default class Directory {
     r.input('user_id', sql.Int, user_id)
     r.input('directory_id', sql.Int, id)
 
-    const result = await r.execute(`${this.schema}uspAddWatchedDirecotry`)
+    const result = await r.execute(`account.uspAddWatchedDirecotry`)
 
     const { error, verified } = result.recordset[0]
 
@@ -167,7 +167,7 @@ export default class Directory {
     r.input('user_id', sql.Int, user_id)
     r.input('directory_id', sql.Int, id)
 
-    const result = await r.execute(`${this.schema}uspRemoveWatchedDirectory`)
+    const result = await r.execute(`account.uspRemoveWatchedDirectory`)
 
     const { error, verified } = result.recordset[0]
 
