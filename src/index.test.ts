@@ -16,7 +16,7 @@ const test = async () => {
   })
   if (!app) return t.error('app undefined')
   t.teardown(() => app.close())
-  
+
   t.test('check if api returns 401 when no token is supplied', async t => {
     const resp = await app.inject({
       method: 'GET',

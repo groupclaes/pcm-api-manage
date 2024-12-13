@@ -1,5 +1,5 @@
 #!/bin/bash
-docker_tag="4.4"
+docker_tag="test"
 docker_reg="groupclaes"
 PACKAGE_VERSION=$(cat package.json \
   | grep version \

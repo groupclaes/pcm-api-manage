@@ -1,29 +1,11 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify"
-import { JWTPayload } from "jose"
+// External dependencies
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import oe from '@groupclaes/oe-connector'
 
-import Document, { IDocument } from "../repositories/document.repository"
+// Internal deps
+import Document, { IDocument } from '../repositories/document.repository'
 import * as helper from '../helper'
-import Directory from "../repositories/directory.repository"
-import sql from 'mssql'
-
-declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
-
-  export interface FastifyRequest {
-    jwt: JWTPayload
-    hasRole: (role: string) => boolean
-    hasPermission: (permission: string, scope?: string) => boolean
-  }
-
-  export interface FastifyReply {
-    success: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    fail: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    error: (message?: string, code?: number, executionTime?: number) => FastifyReply
-  }
-}
+import Directory from '../repositories/directory.repository'
 
 export default async function (fastify: FastifyInstance) {
   fastify.get('/:id', async function (request: FastifyRequest<{

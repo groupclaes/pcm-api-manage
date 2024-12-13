@@ -1,25 +1,8 @@
+// External dependencies
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { JWTPayload } from 'jose'
+
+// Internal deps
 import Profile from '../repositories/profile.repository'
-import sql from 'mssql'
-
-declare module 'fastify' {
-  export interface FastifyInstance {
-    getSqlPool: (name?: string) => Promise<sql.ConnectionPool>
-  }
-  
-  export interface FastifyRequest {
-    jwt: JWTPayload
-    hasRole: (role: string) => boolean
-    hasPermission: (permission: string, scope?: string) => boolean
-  }
-
-  export interface FastifyReply {
-    success: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    fail: (data?: any, code?: number, executionTime?: number) => FastifyReply
-    error: (message?: string, code?: number, executionTime?: number) => FastifyReply
-  }
-}
 
 export default async function (fastify: FastifyInstance) {
   /**
@@ -44,7 +27,11 @@ export default async function (fastify: FastifyInstance) {
       if (result.verified) {
         if (result.error) return reply.error(result.error)
 
-        return reply.success({ dashboard: result.result })
+        return reply.success({
+          dashboard: result.result.recent_posts,
+          watched_directories: result.result.watched_directories,
+          watched_directories_posts: result.result.watched_directories_posts
+        })
       }
       return reply.error('Session has expired!', 401, performance.now() - start)
     } catch (err) {

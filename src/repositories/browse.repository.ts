@@ -33,37 +33,8 @@ export default class Browse {
         result: {
           directories: result.recordsets[1][0] || [],
           documents: result.recordsets[2][0] || [],
-          breadcrumbs: result.recordsets[3][0] || []
+          breadcrumbs: result.recordsets[3] || []
         }
-      }
-    } else {
-      throw new Error(error)
-    }
-  }
-
-  /**
- * Get detail for ui page
- * @deprecated No longer in use, use documentscontroller instead
- * @param {number} id
- * @param {number} user_id
- * @returns {Promise<any>}
- */
-  async getBreadcrumbs(id: number, user_id?: string) {
-    const r = new sql.Request(this._pool)
-    r.input('id', sql.Int, id)
-    r.input('user_id', sql.Int, user_id)
-    this._logger.debug({ sqlParam: { id, user_id }, sqlSchema: this.schema, sqlProc: 'GetUiBreadcrumbs' }, 'running procedure')
-
-    const result = await r.execute('GetUiBreadcrumbs')
-    this._logger.debug({ result }, 'procedure result')
-
-    const { error, verified } = result.recordset[0]
-
-    if (!error) {
-      return {
-        error,
-        verified,
-        breadcrumbs: result.recordsets[1] || []
       }
     } else {
       throw new Error(error)
