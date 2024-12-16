@@ -14,6 +14,7 @@ import profileController from './controllers/profile.controller'
 import searchController from './controllers/search.controller'
 import usersController from './controllers/users.controller'
 import uploadController from './controllers/upload.controller'
+import downloadController from './controllers/download.controller'
 
 const LOGLEVEL = 'debug'
 
@@ -39,6 +40,7 @@ export default async function (config: any): Promise<FastifyInstance | undefined
   await fastify.register(searchController, { prefix: `${version_prefix}/${config.wrapper.serviceName}/search`, logLevel: LOGLEVEL })
   await fastify.register(uploadController, { prefix: `${version_prefix}/${config.wrapper.serviceName}/upload`, logLevel: LOGLEVEL })
   await fastify.register(usersController, { prefix: `${version_prefix}/${config.wrapper.serviceName}/users`, logLevel: LOGLEVEL })
+  await fastify.register(downloadController, { prefix: `${version_prefix}/${config.wrapper.serviceName}/download`, logLevel: LOGLEVEL })
   await fastify.listen({ port: +(env['PORT'] ?? 80), host: '::' })
 
   return fastify
