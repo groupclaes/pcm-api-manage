@@ -57,8 +57,10 @@ export default async function (fastify: FastifyInstance) {
       }[] = (request as any).files()
 
       const relativePath = await repo.getRelativePath(request.query.directory_id)
-      if (!relativePath)
+      if (!relativePath) {
+        request.log.fatal({ directory_id: request.query.directory_id, url: request.url }, 'relativePath was not assigned')
         return reply.error('relativePath not set')
+      }
 
       const relativePathParts = relativePath.split('/')
       const object_type = relativePathParts.length > 1 ? relativePathParts[1] : 'none'
