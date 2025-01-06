@@ -70,7 +70,19 @@ export default async function (fastify: FastifyInstance) {
       for await (const data of parts) {
         // if file size is 0 skip this entry
         if (data.file.bytesRead === 0) {
-          error = 'file has a size of 0 bytes, cannot continue'
+          error = true
+          results.push({
+            verified: false,
+            result: [{
+              filename: data.filename,
+              mimetype: data.mimetype
+            }],
+            error: 'file has a size of 0 bytes, cannot continue'
+          })
+          request.log.warn({
+            filename: data.filename,
+            mimetype: data.mimetype
+          }, 'file has a size of 0 bytes, cannot continue')
           continue
         }
 
@@ -168,10 +180,10 @@ export default async function (fastify: FastifyInstance) {
         }
       }
 
-      if (results.length > 0 && results[0].verified) {
+      if (results.length > 0 && results.some(e => e.verified === true)) {
         return reply.success(results.length > 1 ? results : results[0], 200, performance.now() - start)
-      } else if (error) {
-        return reply.error(error, 400, performance.now() - start)
+      } else if (results.some(e => e.error)) {
+        return reply.error(results.find(e => e.error).error, 500, performance.now() - start)
       }
       return reply.error('Session has expired!', 401, performance.now() - start)
     } catch (err) {
