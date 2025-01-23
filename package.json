@@ -9,7 +9,7 @@
     "test": "tap --reporter=list --show-full-coverage"
   },
   "dependencies": {
-    "@fastify/multipart": "^8.3.0",
+    "@fastify/multipart": "^8.3.1",
     "@groupclaes/fastify-elastic": "^4.4.0",
     "@groupclaes/oe-connector": "^1.2.5",
     "fastify": "^4.28.1",
