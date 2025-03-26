@@ -9,6 +9,14 @@ This api contains all controllers for the management interface available on http
   - GET / #retrieve list of access known in DB
 - /browse
   - GET /
+- /buckets
+  - [GET](/) **/** Get all buckets
+  - [GET](/:id) **/:id** Get a specific bucket
+  - [POST](/) **/** Create a new bucket
+  - [PUT](/:id) **/:id** Update the name of a bucket
+  - [DELETE](/:id) **/:id** Remove an existing bucket
+  - [POST](/:id/:document_id) **/:id/:document_id** Add a document to a bucket
+  - [DELETE](/:id/:document_id) **/:id/:document_id** Remove a document from a bucket
 - /check
   - GET / #get a list of items and datasheet availablility for the provided supplier_id
   - GET /search #query suppliers based on search parameters
@@ -17,7 +25,7 @@ This api contains all controllers for the management interface available on http
   - GET / # list of directories known in DB
   - GET /:id #retrieve details of request directory #id
 - /document
-  - 
+  - GET
 - /languages
   - GET / #retrieve list of languages known in DB
 - /profile
