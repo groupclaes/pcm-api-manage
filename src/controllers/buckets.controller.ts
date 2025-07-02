@@ -16,6 +16,12 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     if (!request.jwt?.sub)
       return reply.fail({ jwt: 'missing authorization' }, 401)
 
+
+    // buckets => add field private (private means single user)
+    // otherwise show everyone in team the bucket
+    // team is everyone in the same department and company
+    // admins remain access to all
+
     if (!request.hasPermission('read', 'GroupClaes.PCM/buckets'))
       return reply.fail({ role: 'missing permission' }, 403)
 

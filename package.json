@@ -9,19 +9,19 @@
     "test": "tap --reporter=list --show-full-coverage"
   },
   "dependencies": {
-    "@fastify/multipart": "^8.3.0",
-    "@groupclaes/fastify-elastic": "^4.4.0",
+    "@fastify/multipart": "^8.3.1",
+    "@groupclaes/fastify-elastic": "^4.4.1",
     "@groupclaes/oe-connector": "^1.2.5",
-    "fastify": "^4.28.1",
-    "jose": "^5.9.3",
+    "fastify": "^4.29.1",
+    "jose": "^5.10.0",
     "mssql": "^11.0.1",
     "pdf-lib": "^1.17.1",
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "@types/mssql": "^9.1.5",
-    "@types/node": "^20.16.5",
-    "esbuild": "^0.19.12",
+    "@types/mssql": "^9.1.7",
+    "@types/node": "^20.19.2",
+    "esbuild": "^0.25.5",
     "tap": "^18.8.0"
   }
 }
